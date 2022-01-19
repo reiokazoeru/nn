@@ -63,3 +63,11 @@ def Train(network, loss, loss_prime, x_train, y_train, epochs = 1000, learning_r
         error /= len(x_train)
         if verbose:
             print(f"{e + 1}/{epochs}, error={error}")
+def Save(network): #save trained network
+    savinL = [None for i in range(network)]
+    for i,layer in enumerate(network):
+        if type(layer) is Dense:
+            savinL[i] = {"enum":i,"type":Dense,"weights":layer.weights,"bias":layer.bias}
+        elif type(layer) is Tanh:
+            savinL[i] = {"enum":i,"type":Tanh}
+    return {"network":network,"values":savinL}
