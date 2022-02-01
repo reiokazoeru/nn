@@ -1,4 +1,8 @@
+import json
+from pydoc import describe
 import numpy as np
+from time import time
+import pickle
 
 class Layer:
     def __init__(self) -> None:
@@ -36,6 +40,27 @@ class Tanh(Activation):
         tanh = lambda x: np.tanh(x)
         tanh_prime = lambda x: 1-np.tanh(x) **2
         super().__init__(tanh,tanh_prime)
+class Network():
+    def __init__(self) -> None:
+        self.norm = []
+        self.export = []
+    def importNet(self,denseObjectList):
+        self.export = denseObjectList
+        self.norm = [0 for i in range(2*len(self.export))]
+        for j in range(2*len(self.export)):
+            if j%2 == 0 or j == 0:
+                self.norm[j] = self.export[int(j/2)]
+            else:
+                self.norm[j] = Tanh()
+    def newNet(self,denseDimList):
+        for
+        self.norm = [0 for i in range(2*len(self.export))]
+        for j in range(2*len(self.export)):
+            if j%2 == 0 or j == 0:
+                self.norm[j] = self.export[int(j/2)]
+            else:
+                self.norm[j] = Tanh()
+
 def mse(y_true,y_pred):
     return np.mean(np.power(y_pred-y_true,2))
 def mse_prime(y_true,y_pred):
@@ -63,11 +88,35 @@ def Train(network, loss, loss_prime, x_train, y_train, epochs = 1000, learning_r
         error /= len(x_train)
         if verbose:
             print(f"{e + 1}/{epochs}, error={error}")
-def Save(network): #save trained network
-    savinL = [None for i in range(network)]
+def SaveNet(network): #save trained network
+    denseNet = []
     for i,layer in enumerate(network):
-        if type(layer) is Dense:
-            savinL[i] = {"enum":i,"type":Dense,"weights":layer.weights,"bias":layer.bias}
-        elif type(layer) is Tanh:
-            savinL[i] = {"enum":i,"type":Tanh}
-    return {"network":network,"values":savinL}
+        if i%2 != 0:
+            denseNet.append(layer)
+    network = denseNet
+    with open(str(round(time()))+'network.obj','w') as outp:
+        pickle.dump(network,outp,pickle.HIGHEST_PROTOCOL)    
+    print('Saved Network as '+str(round(time()))+'network.obj')
+def LoadNet(fPath):
+    return json.load(open(fPath))
+def jsonLoader(fName):
+    jsonFile = open(fName)
+    rawList = json.load(jsonFile)
+
+    xList = []
+    yList = []
+
+    for head in rawList:
+        tempList = []
+        for data in head["in"]:
+            tempList.append(head["in"][data])
+        xList.append(tempList)
+        tempList = []
+        for data in head["out"]:
+            tempList.append(head["out"][data])
+        yList.append(tempList)
+    inLen = len(xList[0])
+    outLen = len(yList[0])
+    X = np.reshape(xList,(len(xList),inLen,1))
+    Y = np.reshape(yList,(len(yList),outLen,1))
+    return X,Y,inLen,outLen
