@@ -37,29 +37,37 @@ class Activation(Layer):
         return np.multiply(output_gradient,self.activation_prime(self.input))
 class Tanh(Activation):
     def __init__(self) -> None:
-        tanh = lambda x: np.tanh(x)
-        tanh_prime = lambda x: 1-np.tanh(x) **2
+        def tanh(x):
+            return np.tanh(x)
+        def tanh_prime(x):
+            return 1-np.tanh(x) **2
         super().__init__(tanh,tanh_prime)
 class Network():
-    def __init__(self) -> None:
-        self.norm = []
-        self.export = []
-    def importNet(self,denseObjectList):
-        self.export = denseObjectList
-        self.norm = [0 for i in range(2*len(self.export))]
-        for j in range(2*len(self.export)):
-            if j%2 == 0 or j == 0:
-                self.norm[j] = self.export[int(j/2)]
-            else:
-                self.norm[j] = Tanh()
-    def newNet(self,denseDimList):
-        for
-        self.norm = [0 for i in range(2*len(self.export))]
-        for j in range(2*len(self.export)):
-            if j%2 == 0 or j == 0:
-                self.norm[j] = self.export[int(j/2)]
-            else:
-                self.norm[j] = Tanh()
+    def __init__(self,netList) -> None: 
+        """
+        netlist format:
+        [in values,dense layer n width,out values]
+        """
+        self.netList = netList
+    def genNetwork(self):
+        nL = self.netList
+        net = []
+        for i,j in enumerate(nL):
+            net.append(Dense(j,nL[i+1]))
+            net.append(Tanh())
+        self.net = net
+    def loadNetwork(self,fName):
+        with open(fName,'rb') as inp:
+            net = pickle.load(inp)
+    def saveNetwork(self,cFName):
+        if cFName == None:
+            with open(str(round(time()))+'network.obj','wb') as outp:
+                pickle.dump(self.net,outp,pickle.HIGHEST_PROTOCOL)
+        else:
+            with open(cFName+'.obj','wb') as outp:
+                pickle.dump(self.net,outp,pickle.HIGHEST_PROTOCOL)
+
+        
 
 def mse(y_true,y_pred):
     return np.mean(np.power(y_pred-y_true,2))

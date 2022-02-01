@@ -17,7 +17,7 @@ DONE
 
 """
 
-fName = 'scripts\\headData.json'
+fName = 'headData.json'
 
 X,Y,inLen,outLen = jsonLoader(fName)
 # print(X)
