@@ -1,4 +1,5 @@
-from backend import Dense,Tanh,Train,mse,mse_prime,predict
+from tkinter.tix import Tree
+from backend import Dense,Tanh,Train,mse,mse_prime,predict,Network
 
 import matplotlib as plt
 import numpy as np
@@ -6,14 +7,11 @@ import numpy as np
 X = np.reshape([[0,0],[0,0],[1,0],[1,1]],(4,2,1))
 Y = np.reshape([[0],[1],[1],[0]],(4,1,1))
 
-network = [
-    Dense(2,3),
-    Tanh(),
-    Dense(3,1),
-    Tanh()
-]
+network = Network([2,3,1])
+network.genNetwork()
 
-Train(network,mse,mse_prime,X,Y,epochs=100000,learning_rate=0.1)
+network.train(X,Y)
 
-print(predict(network,[[1.2],[1.2]]))
-print(predict(network,[[1],[0]]))
+print(network.predict([[1.2],[1.2]]))
+
+print(network.predict([[1],[0]]))

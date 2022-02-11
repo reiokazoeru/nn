@@ -43,7 +43,7 @@ class Tanh(Activation):
             return 1-np.tanh(x) **2
         super().__init__(tanh,tanh_prime)
 class Network():
-    def __init__(self,netList) -> None: 
+    def __init__(self,netList): 
         """
         netlist format:
         [in values,dense layer n width,out values]
@@ -52,8 +52,8 @@ class Network():
     def genNetwork(self):
         nL = self.netList
         net = []
-        for i,j in enumerate(nL):
-            net.append(Dense(j,nL[i+1]))
+        for i in range(len(nL)-1):
+            net.append(Dense(nL[i],nL[i+1]))
             net.append(Tanh())
         self.net = net
     def loadNetwork(self,fName):
@@ -66,6 +66,29 @@ class Network():
         else:
             with open(cFName+'.obj','wb') as outp:
                 pickle.dump(self.net,outp,pickle.HIGHEST_PROTOCOL)
+    def train(self, x_train, y_train, epochs = 10000, learning_rate = 0.01, verbose = True):
+        for e in range(epochs):
+            error = 0
+            for x, y in zip(x_train, y_train):
+                # forward
+                output = predict(self.net, x)
+
+                # error
+                error += mse(y, output)
+
+                # backward
+                grad = mse_prime(y, output)
+                for layer in reversed(self.net):
+                    grad = layer.backward(grad, learning_rate)
+
+            error /= len(x_train)
+            if verbose:
+                print(f"{e + 1}/{epochs}, error={error}")
+    def predict(self, input):
+        output = input
+        for layer in self.net:
+            output = layer.forward(output)
+        return output
 
         
 
@@ -105,8 +128,6 @@ def SaveNet(network): #save trained network
     with open(str(round(time()))+'network.obj','w') as outp:
         pickle.dump(network,outp,pickle.HIGHEST_PROTOCOL)    
     print('Saved Network as '+str(round(time()))+'network.obj')
-def LoadNet(fPath):
-    return json.load(open(fPath))
 def jsonLoader(fName):
     jsonFile = open(fName)
     rawList = json.load(jsonFile)
