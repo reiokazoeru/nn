@@ -1,3 +1,4 @@
+from distutils.command.clean import clean
 import ezdxf
 import sys
 import numpy as np
@@ -124,6 +125,7 @@ def docMaker(nfname,masterNoodles):
         for j in range(13):
             tempNoodles.append(masterNoodles[(i*13)+j])
         goodNoodles.append(tempNoodles)
+    goodNoodles = cleanFromNN(goodNoodles)
     for i in goodNoodles:
         # for each entry in the list make that object
         if i[0] == 1:
@@ -156,3 +158,6 @@ def cleanFromNN(masternoodle,decim):
     # round numbers to make them nicer going into docMaker
     # decim decides how many decimals to round to
     pass
+    for i in masternoodle:
+        for j in i:
+            r
